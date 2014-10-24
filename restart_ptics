@@ -1,0 +1,5 @@
+#!/bin/bash
+DOCKER_CONTAINER=$(docker ps | grep alex-ptics | awk '{print $1}')
+
+docker stop $DOCKER_CONTAINER
+docker run alex-ptics ./vhub_live_kaldi

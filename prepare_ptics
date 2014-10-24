@@ -1,0 +1,22 @@
+#!/bin/bash
+# TODO: Own dsgprod user for redmine.
+# TODO: Add --no-cache=true --rm=true to docker build.
+
+BUILD_DIR="$(mktemp -d)"
+
+docker rmi alex
+docker rmi alex-ptics
+
+cd ${BUILD_DIR}
+
+git clone https://github.com/UFAL-DSG/alex
+git clone https://lukas.zilka@redmine.ms.mff.cuni.cz/vystadial/vystadial-private.git alex/alex/resources/private
+
+cd alex
+git checkout split_alex_requirements
+docker build -t alex .
+docker build -t alex-ptics alex/applications/PublicTransportInfoCS
+#cd /
+
+#rm -rf ${BUILD_DIR}
+
