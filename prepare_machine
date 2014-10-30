@@ -1,0 +1,8 @@
+#!/bin/bash
+# This script prepares the machine to run Alex PTICS.
+
+mkdir /usr/local/share/ca-certificates/docker-dev-cert
+cp dev-docker-ca.crt /usr/local/share/ca-certificates/docker-dev-cert/devdockerCA.crt 
+update-ca-certificates
+service docker restart
+docker login https://vystadial.ms.mff.cuni.cz:8080

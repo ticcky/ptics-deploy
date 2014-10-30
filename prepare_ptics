@@ -3,21 +3,47 @@
 # TODO: Add --no-cache=true --rm=true to docker build.
 set -e
 
+DOCKER_INDEX=vystadial.ms.mff.cuni.cz:8080
+TAG=$(date +%Y%m%d_%H%M%S)_$(git rev-parse HEAD) 
 BUILD_DIR="$(mktemp -d)"
+LOG=$BUILD_DIR/build.log
+DOCKERLOG=$BUILD_DIR/docker.log
+RUNLOG=$BUILD_DIR/run.log
+LOGS="$LOG $DOCKERLOG $RUNLOG"
 
-docker rmi alex || true 
-docker rmi alex-ptics || true 
+# Start log monitoring.
+killall tailon || true
+touch $LOGS
+tailon -f $LOGS -b 0.0.0.0:5000 &
+
+echo "Building in ${BUILD_DIR} @ $(hostname -f)" > $LOG
 
 cd ${BUILD_DIR}
 
+echo "Checking out source." >> $LOG 
+
+# Check out the source.
 git clone https://github.com/UFAL-DSG/alex
 git clone https://lukas.zilka@redmine.ms.mff.cuni.cz/vystadial/vystadial-private.git alex/alex/resources/private
-
 cd alex
 git checkout split_alex_requirements
-docker build -t alex .
-docker build -t alex-ptics alex/applications/PublicTransportInfoCS
-#cd /
 
-#rm -rf ${BUILD_DIR}
+echo "Baking Docker images." >> $LOG 
+
+# Bake Docker image.
+docker build -t alex . > $DOCKERLOG
+docker build -t ${DOCKER_INDEX}/alex-ptics-$TAG alex/applications/PublicTransportInfoCS >> $DOCKERLOG
+docker push ${DOCKER_INDEX}/alex-ptics-$TAG >> $DOCKERLOG
+rm -rf ${BUILD_DIR}
+
+echo "Running integration tests." >> $LOG 
+
+# Perform integration tests.
+docker run alex-ptics-$TAG bash run_integration_test.sh > $RUNLOG
+
+echo "Running ALEX." >> $LOG 
+# Run.
+docker kill alex-staging
+docker rm alex-staging
+docker run --name alex-staging alex-ptics-$TAG bash vhub_staging >> $RUNLOG
 
