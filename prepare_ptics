@@ -1,11 +1,12 @@
 #!/bin/bash
 # TODO: Own dsgprod user for redmine.
 # TODO: Add --no-cache=true --rm=true to docker build.
+set -e
 
 BUILD_DIR="$(mktemp -d)"
 
-docker rmi alex
-docker rmi alex-ptics
+docker rmi alex || true 
+docker rmi alex-ptics || true 
 
 cd ${BUILD_DIR}
 
