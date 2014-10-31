@@ -6,3 +6,5 @@ cp dev-docker-ca.crt /usr/local/share/ca-certificates/docker-dev-cert/devdockerC
 update-ca-certificates
 service docker restart
 docker login https://vystadial.ms.mff.cuni.cz:8080
+
+echo "Don't forget to add private ssh key to access private git repository!"
