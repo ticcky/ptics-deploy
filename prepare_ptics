@@ -24,7 +24,7 @@ echo "Checking out source." >> $LOG
 
 # Check out the source.
 git clone https://github.com/UFAL-DSG/alex
-git clone https://lukas.zilka@redmine.ms.mff.cuni.cz/vystadial/vystadial-private.git alex/alex/resources/private
+git clone gitolite@redmine.ms.mff.cuni.cz:vystadial/vystadial-private.git alex/alex/resources/private
 cd alex
 git checkout split_alex_requirements
 
